@@ -67,19 +67,25 @@ int findDailyBrandSales(int arr[DAYS_IN_YEAR][NUM_OF_BRANDS][NUM_OF_TYPES], int 
     return total;
 }
 int findBestSoldBrand(int arr[DAYS_IN_YEAR][NUM_OF_BRANDS][NUM_OF_TYPES], int day) {
-    int bestSold = 0;
+    int bestSoldBrand = 0;
+    int bestTotal = 0;
     for(int brand=0; brand<NUM_OF_BRANDS; brand++) {
-        if(findDailyBrandSales(arr,day,brand)>bestSold) {
-            bestSold = brand;
+        int total = findDailyBrandSales(arr,day,brand);
+        if(total > bestTotal) {
+            bestTotal = total;
+            bestSoldBrand = brand;
         }
     }
-    return bestSold;
+    return bestSoldBrand;
 }
 int findBestSoldType(int arr[DAYS_IN_YEAR][NUM_OF_BRANDS][NUM_OF_TYPES], int day) {
     int bestSold = 0;
+    int bestTotal = 0;
     for(int type=0; type<NUM_OF_TYPES; type++) {
-        if(findDailyTypeSales(arr,day,type)>bestSold) {
+        int total = findDailyTypeSales(arr,day,type);
+        if(total > bestTotal) {
             bestSold = type;
+            bestTotal = total;
         }
     }
     return bestSold;
@@ -107,8 +113,11 @@ int findOverallTypeSales(int arr[DAYS_IN_YEAR][NUM_OF_BRANDS][NUM_OF_TYPES], int
 }
 int findMostProfitDay(int arr[DAYS_IN_YEAR][NUM_OF_BRANDS][NUM_OF_TYPES], int days) {
     int  bestDay= 0;
+    int  bestTotal = 0;
     for(int day=0; day<days; day++) {
-        if(findDailySales(arr,day)>bestDay) {
+        int total = findDailySales(arr,day);
+        if (total>bestTotal) {
+            bestTotal = total;
             bestDay = day;
         }
     }
@@ -116,8 +125,11 @@ int findMostProfitDay(int arr[DAYS_IN_YEAR][NUM_OF_BRANDS][NUM_OF_TYPES], int da
 }
 int findBestType(int arr[DAYS_IN_YEAR][NUM_OF_BRANDS][NUM_OF_TYPES],int days) {
     int bestType = 0;
+    int maxTotal = 0;
     for(int type=0; type<NUM_OF_TYPES; type++) {
-        if(findOverallTypeSales(arr,days,type)>bestType) {
+        int total = findOverallTypeSales(arr,days,type);
+        if(total > maxTotal) {
+            maxTotal = total;
             bestType = type;
         }
     }
@@ -125,8 +137,11 @@ int findBestType(int arr[DAYS_IN_YEAR][NUM_OF_BRANDS][NUM_OF_TYPES],int days) {
 }
 int findBestBrand(int arr[DAYS_IN_YEAR][NUM_OF_BRANDS][NUM_OF_TYPES],int days) {
     int bestBrand = 0;
+    int maxTotal = 0;
     for(int brand=0; brand<NUM_OF_BRANDS; brand++) {
-        if(findOverallBrandSales(arr,days,brand)>bestBrand) {
+        int total = findOverallBrandSales(arr,days,brand);
+        if(total > maxTotal) {
+            maxTotal = total;
             bestBrand = brand;
         }
     }
@@ -183,18 +198,18 @@ int main() {
                 printf("What day would you like to analyze?\n");
                 scanf("%d", &day);
                 while(day>=DAYS_IN_YEAR||day<0||day>days[0]) {
-                    printf("Please enter a valid day.\nWhich day would you like to analyze?\n");
+                    printf("Please enter a valid day.\nWhat day would you like to analyze?\n");
                     scanf("%d", &day);
                 }
-                day--;
-                int totalSales = findDailySales(cube,day);
-                int bestSoldBrand = findBestSoldBrand(cube,day);
-                int bestSoldType = findBestSoldType(cube,day);
-                day++;
+
+                int totalSales = findDailySales(cube,day-1);
+                int bestSoldBrand = findBestSoldBrand(cube,day-1);
+                int bestSoldType = findBestSoldType(cube,day-1);
+
                 printf("In day number %d:\nThe sales total was %d\n",day,totalSales);
-                printf("The best sold brand with %d sales was %s\n",findDailyBrandSales(cube,day,bestSoldBrand),
+                printf("The best sold brand with %d sales was %s\n",findDailyBrandSales(cube,day-1,bestSoldBrand),
                     brands[bestSoldBrand]);
-                printf("The best sold type with %d sales was %s\n",findDailyTypeSales(cube,day,bestSoldType),
+                printf("The best sold type with %d sales was %s\n",findDailyTypeSales(cube,day-1,bestSoldType),
                     types[bestSoldType]);
                 break;
             case print:
@@ -202,7 +217,7 @@ int main() {
                 for(int brand=0; brand<NUM_OF_BRANDS; brand++) {
                     printf("Sales for %s:\n",brands[brand]);
                     for(int day=0; day<days[0]; day++) {
-                        printf("Day %d-",day+1);
+                        printf("Day %d- ",day+1);
                         for(int type=0; type<NUM_OF_TYPES; type++) {
                             printf("%s: %d ", types[type], cube[day][brand][type]);
                         }
@@ -215,18 +230,18 @@ int main() {
                 int bestBrand=findBestBrand(cube,days[0]);
                 int bestType=findBestType(cube,days[0]);
                 int bestDay=findMostProfitDay(cube,days[0]);
-                printf("The best-selling brand overall is %s:%d$\n",brands[bestBrand],
+                printf("The best-selling brand overall is %s: %d$\n",brands[bestBrand],
                     findOverallBrandSales(cube,days[0],bestBrand));
-                printf("The best-selling type of car is %s:%d$\n",
+                printf("The best-selling type of car is %s: %d$\n",
                     types[bestType],findOverallTypeSales(cube,days[0],bestType));
-                printf("The most profitable day was day number %d:%d$\n",bestDay+1,findDailySales(cube,bestDay));
+                printf("The most profitable day was day number %d: %d$\n",bestDay+1,findDailySales(cube,bestDay));
                 break;
             case deltas:
                 for(int brand=0; brand<NUM_OF_BRANDS; brand++) {
                     float delta = findBrandDelta(cube,days[0],brand);
                     float denominator  = days[0]-1;
                     float avgDelta = delta/denominator ;
-                    printf("Brand: %s, Average Delta:%f\n",brands[brand],avgDelta);
+                    printf("Brand: %s, Average Delta: %f\n",brands[brand],avgDelta);
                 }
                 break;
                 default:
