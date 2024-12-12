@@ -209,6 +209,7 @@ int main() {
                         printf("\n");
                     }
                 }
+                printf("\n*****************************************\n")
                 break;
             case insights:
                 int bestBrand=findBestBrand(cube,days[0]);
